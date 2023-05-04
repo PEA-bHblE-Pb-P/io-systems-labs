@@ -59,77 +59,81 @@ static struct lock_class_key sr_bio_compl_lkclass;
 #define head4size(s) (((s) % CYL_SIZE) / HEAD_SIZE)
 #define cyl4size(s) ((s) / CYL_SIZE)
 
+#define PRM 0x83
+#define EXT 0x05
+#define MIB_TO_SECTORS(mib) (mib * 1024 * 1024 / 512)
+
 static PartTable def_part_table =
 {
 	{
 		boot_type: 0x00,
-		start_sec: 0x2,
+		start_sec: 0x0,
 		start_head: 0x0,
 		start_cyl: 0x0,
-		part_type: 0x83,
-		end_head: head4size(0xEFFF),
-		end_sec: sec4size(0xEFFF),
-		end_cyl: 0x9F,
+		part_type: PRM,
+		end_head: 0x0,
+		end_sec: 0x0,
+		end_cyl: 0x0,
 		abs_start_sec: 0x1,
-		sec_in_part: 0xEFFF
+		sec_in_part: MIB_TO_SECTORS(30) - 1
 	},
 	{
 		boot_type: 0x00,
-		start_head: head4size(0xF000),
-		start_sec: sec4size(0xF000),
+		start_head: 0x0,
+		start_sec: 0x1,
 		start_cyl: 0x0,
-		part_type: 0x05, // extended partition type
-		end_sec: sec4size(0x18FFFF),
-		end_head: head4size(0x18FFFF),
-		end_cyl: 0x9F,
-		abs_start_sec: 0xF000, 
-		sec_in_part: 0xA000
+		part_type: EXT,
+		end_sec: 0x0,
+		end_head: 0x0,
+		end_cyl: 0x0,
+		abs_start_sec: MIB_TO_SECTORS(30), 
+		sec_in_part: MIB_TO_SECTORS(20)
 	},
 };
 
-static unsigned int def_log_part_br_abs_start_sector[] = {0xF000, 0x14000};
+static unsigned int def_log_part_br_abs_start_sector[] = {MIB_TO_SECTORS(30), MIB_TO_SECTORS(40)};
 static const PartTable def_log_part_table[] =
 {
 	{
 		{
-			boot_type: 0x00,
-			start_head: head4size(0xF000),
-			start_sec: sec4size(0xF000),
-			start_cyl: 0x0,
-			part_type: 0x83,
-			end_head: head4size(0x13FFF),
-			end_sec: sec4size(0x13FFF),
-			end_cyl: 0x9F,
-			abs_start_sec: 0x1,
-			sec_in_part: 0x4FFF
-		},
-        {
-			boot_type: 0x00,
-			start_head: head4size(0x14000),
-			start_sec: sec4size(0x14000), 
+			boot_type: 0x0,
+			start_head: 0x0,
+			start_sec: 0x2, 
 			start_cyl: 0x0, 
-			part_type: 0x05,
-			end_head: head4size(0x18FFFF),
-			end_sec: sec4size(0x18FFFF),
-			end_cyl: 0x9F,
-			abs_start_sec: 0x5000,
-			sec_in_part: 0x5000
+			part_type: PRM,
+			end_head: 0x0,
+			end_sec: 0x0,
+			end_cyl: 0x0,
+			abs_start_sec: 0x1,
+			sec_in_part: MIB_TO_SECTORS(10) - 1
+		},
+		{
+			boot_type: 0x0,
+			start_head: 0x0,
+			start_sec: 0x1,
+			start_cyl: 0x00,
+			part_type: EXT,
+			end_head: 0x0,
+			end_sec: 0x0,
+			end_cyl: 0x0,
+			abs_start_sec: MIB_TO_SECTORS(10),
+			sec_in_part: MIB_TO_SECTORS(10)
 		}
 	},
-    {
+	{
         {
-		    boot_type: 0x00,
-		    start_head: head4size(0x14000),
-		    start_sec: sec4size(0x14000),
-		    start_cyl: 0x0,
-		    part_type: 0x83,
-		    end_head: head4size(0x18FFFF),
-		    end_sec: sec4size(0x18FFFF),
-		    end_cyl: 0x9F,
-		    abs_start_sec: 0x1,
-		    sec_in_part: 0x4FFF
-	    }    
-    }
+            boot_type: 0x0,
+            start_head: 0x0,
+            start_sec: 0x02,
+            start_cyl: 0x0,
+            part_type: PRM,
+            end_head: 0x0,
+            end_sec: 0x0,
+            end_cyl: 0x0,
+            abs_start_sec: 0x1,
+            sec_in_part: MIB_TO_SECTORS(10) - 1
+        }
+	}
 };
 
 static void copy_mbr(u8 *disk) {

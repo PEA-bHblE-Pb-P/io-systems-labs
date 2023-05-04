@@ -80,9 +80,9 @@ mkfs.vfat /dev/vramdisk6
 Монтируем их:
 
 ```bash
-mkdir /mnt/vram1 && mount -t vfat /dev/vramdisk1 /mnt/vram1
-mddir /mnt/vram5 && mount -t vfat /dev/vramdisk5 /mnt/vram5
-mkdir /mnt/vram6 && mount -t vfat /dev/vramdisk6 /mnt/vram6
+mkdir -p /mnt/vram1 && mount -t vfat /dev/vramdisk1 /mnt/vram1
+mkdir -p /mnt/vram5 && mount -t vfat /dev/vramdisk5 /mnt/vram5
+mkdir -p /mnt/vram6 && mount -t vfat /dev/vramdisk6 /mnt/vram6
 ```
 
 Проверяем:
