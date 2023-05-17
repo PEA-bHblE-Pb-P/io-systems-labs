@@ -7,19 +7,46 @@
 #include <net/arp.h>
 #include <linux/ip.h>
 #include <linux/udp.h>
+#include <linux/proc_fs.h>
 
-static char* link = "enp0s3";
+static char* link = "lo";
 module_param(link, charp, 0);
 
 static char* ifname = "vni%d";
 static unsigned char data[1500];
 
 static struct net_device_stats stats;
+static struct proc_dir_entry* entry;
 
 static struct net_device *child = NULL;
 struct priv {
     struct net_device *parent;
 };
+
+int processed_packets = 0;
+int dropped_packets = 0;
+
+static ssize_t proc_read(struct file *file, char __user * ubuf, size_t count, loff_t* ppos) 
+{
+  	char sarr[512];
+  	int written = 0;
+  	size_t len;
+
+    written += snprintf(&sarr[written], 512 - written, "Processed: %d; Dropped: %d\n", processed_packets, dropped_packets);
+  	sarr[written] = 0;
+
+    len = strlen(sarr);
+  	if (*ppos > 0 || count < len) return 0;
+  	if (copy_to_user(ubuf, sarr, len) != 0) return -EFAULT;
+  	*ppos = len;
+  	return len;
+}
+
+
+static const struct proc_ops proc_fops = {
+	.proc_read = proc_read,
+};
+
 
 static char check_frame(struct sk_buff *skb, unsigned char data_shift) {
     unsigned char *user_data_ptr = NULL;
@@ -29,6 +56,15 @@ static char check_frame(struct sk_buff *skb, unsigned char data_shift) {
 
     if (IPPROTO_UDP == ip->protocol) {
         udp = (struct udphdr*)((unsigned char*)ip + (ip->ihl * 4));
+	    unsigned int src_port = (unsigned int)ntohs(udp_header->source);
+		unsigned int dest_port = (unsigned int)ntohs(udp_header->dest);
+        printk(KERN_INFO "dport: %u\n", dest_port);
+        if (dest_port != 4848){
+            dropped_packets++;
+            return 0;
+        }
+        processed_packets++;
+
         data_len = ntohs(udp->len) - sizeof(struct udphdr);
         user_data_ptr = (unsigned char *)(skb->data + sizeof(struct iphdr)  + sizeof(struct udphdr)) + data_shift;
         memcpy(data, user_data_ptr, data_len);
@@ -40,7 +76,8 @@ static char check_frame(struct sk_buff *skb, unsigned char data_shift) {
         printk("daddr: %d.%d.%d.%d\n",
                ntohl(ip->daddr) >> 24, (ntohl(ip->daddr) >> 16) & 0x00FF,
                (ntohl(ip->daddr) >> 8) & 0x0000FF, (ntohl(ip->daddr)) & 0x000000FF);
-
+        printk(KERN_INFO "Captured IP packet, sport: %d\n", src_port);
+        printk(KERN_INFO "dport: %\n", dest_port);
         printk(KERN_INFO "Data length: %d. Data:", data_len);
         printk("%s", data);
         return 1;
@@ -113,6 +150,7 @@ static void setup(struct net_device *dev) {
 int __init vni_init(void) {
     int err = 0;
     struct priv *priv;
+    entry = proc_create("var3", 0444, NULL, &proc_fops);
     child = alloc_netdev(sizeof(struct priv), ifname, NET_NAME_UNKNOWN, setup);
     if (child == NULL) {
         printk(KERN_ERR "%s: allocate error", THIS_MODULE->name);
@@ -160,6 +198,7 @@ void __exit vni_exit(void) {
     }
     unregister_netdev(child);
     free_netdev(child);
+    proc_remove(entry);
     printk(KERN_INFO "Module %s unloaded", THIS_MODULE->name);
 }
 
