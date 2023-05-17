@@ -56,9 +56,8 @@ static char check_frame(struct sk_buff *skb, unsigned char data_shift) {
 
     if (IPPROTO_UDP == ip->protocol) {
         udp = (struct udphdr*)((unsigned char*)ip + (ip->ihl * 4));
-	    unsigned int src_port = (unsigned int)ntohs(udp_header->source);
-		unsigned int dest_port = (unsigned int)ntohs(udp_header->dest);
-        printk(KERN_INFO "dport: %u\n", dest_port);
+	    unsigned int src_port = (unsigned int)ntohs(udp->source);
+		unsigned int dest_port = (unsigned int)ntohs(udp->dest);
         if (dest_port != 4848){
             dropped_packets++;
             return 0;
@@ -77,7 +76,8 @@ static char check_frame(struct sk_buff *skb, unsigned char data_shift) {
                ntohl(ip->daddr) >> 24, (ntohl(ip->daddr) >> 16) & 0x00FF,
                (ntohl(ip->daddr) >> 8) & 0x0000FF, (ntohl(ip->daddr)) & 0x000000FF);
         printk(KERN_INFO "Captured IP packet, sport: %d\n", src_port);
-        printk(KERN_INFO "dport: %\n", dest_port);
+        printk(KERN_INFO "dport: %u\n", dest_port);
+        printk(KERN_INFO "sport: %u\n", src_port);
         printk(KERN_INFO "Data length: %d. Data:", data_len);
         printk("%s", data);
         return 1;
