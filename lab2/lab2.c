@@ -33,25 +33,25 @@ int major = 0; // Variable for Major Number
 
 typedef struct {
   unsigned char boot_type; // 0x00 - Inactive; 0x80 - Active (Bootable)
-  unsigned char start_head;
+  unsigned char start_head; // Номер головки диска, с которой начинается раздел
   unsigned char start_sec : 6;
   unsigned char start_cyl_hi : 2;
-  unsigned char start_cyl;
-  unsigned char part_type;
+  unsigned char start_cyl; // extended partition start cylinder (BR location)
+  unsigned char part_type; // Код типа раздела System ID
   unsigned char end_head;
   unsigned char end_sec : 6;
   unsigned char end_cyl_hi : 2;
   unsigned char end_cyl;
-  unsigned int abs_start_sec;
-  unsigned int sec_in_part;
+  unsigned int abs_start_sec; // число секторов перед разделом
+  unsigned int sec_in_part; // число секторов в разделе
 } PartEntry;
 
 typedef PartEntry PartTable[4];
 
 static struct lock_class_key sr_bio_compl_lkclass;
 
-#define SEC_PER_HEAD 63
-#define HEAD_PER_CYL 255
+#define SEC_PER_HEAD 63 // Number of sectors per track (head)
+#define HEAD_PER_CYL 255 // Number of heads or disks
 #define HEAD_SIZE (SEC_PER_HEAD * MDISK_SECTOR_SIZE)
 #define CYL_SIZE (SEC_PER_HEAD * HEAD_PER_CYL * MDISK_SECTOR_SIZE)
 
@@ -86,7 +86,7 @@ static PartTable def_part_table =
 		end_sec: 0x0,
 		end_head: 0x0,
 		end_cyl: 0x0,
-		abs_start_sec: MIB_TO_SECTORS(30), 
+		abs_start_sec: MIB_TO_SECTORS(30),
 		sec_in_part: MIB_TO_SECTORS(20)
 	},
 };
@@ -98,8 +98,8 @@ static const PartTable def_log_part_table[] =
 		{
 			boot_type: 0x0,
 			start_head: 0x0,
-			start_sec: 0x2, 
-			start_cyl: 0x0, 
+			start_sec: 0x2,
+			start_cyl: 0x0,
 			part_type: PRM,
 			end_head: 0x0,
 			end_sec: 0x0,
@@ -380,5 +380,5 @@ void __exit vramdisk_drive_exit(void) {
 module_init(vramdisk_drive_init);
 module_exit(vramdisk_drive_exit);
 MODULE_LICENSE("Dual MIT/GPL");
-MODULE_AUTHOR("Bitway");
+MODULE_AUTHOR("PEA-bHblE-Pb-P");
 MODULE_DESCRIPTION("BLOCK DRIVER");
