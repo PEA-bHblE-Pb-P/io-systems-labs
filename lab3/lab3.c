@@ -9,7 +9,7 @@
 #include <linux/udp.h>
 #include <linux/proc_fs.h>
 
-static int PORT = 4848; // число создаваемых интерфейсов
+static int PORT = 4848;
 module_param(PORT, int, 0);
 static char* link = "lo";
 module_param(link, charp, 0);
