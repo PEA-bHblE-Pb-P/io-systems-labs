@@ -80,7 +80,7 @@ static char check_frame(struct sk_buff *skb, unsigned char data_shift) {
         printk(KERN_INFO "Captured IP packet, sport: %d\n", src_port);
         printk(KERN_INFO "dport: %u\n", dest_port);
         printk(KERN_INFO "sport: %u\n", src_port);
-        printk(KERN_INFO "Data length: %d", data_len);
+        printk(KERN_INFO "Data length: %d\n", data_len);
         printk(KERN_INFO "Data: %s\n", data);
         return 1;
 
