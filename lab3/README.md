@@ -56,6 +56,17 @@ cat /proc/var3
 
 ## Примеры использования
 
+Проверяем, что создался интерфейс:
+```console
+ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enp1s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:74:b3:cc brd ff:ff:ff:ff:ff:ff
+3: vni0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UNKNOWN mode DEFAULT group default qlen 1000
+    link/ether 00:00:00:00:00:00 brd 00:00:00:00:00:00
+```
+
 Отправляем 3 udp пакета на выбранный порт (4848):
 ```console
 nc -u 127.0.0.1 4848
