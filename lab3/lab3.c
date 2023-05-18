@@ -9,6 +9,8 @@
 #include <linux/udp.h>
 #include <linux/proc_fs.h>
 
+#define PORT 4848
+
 static char* link = "lo";
 module_param(link, charp, 0);
 
@@ -58,7 +60,7 @@ static char check_frame(struct sk_buff *skb, unsigned char data_shift) {
         udp = (struct udphdr*)((unsigned char*)ip + (ip->ihl * 4));
 	    unsigned int src_port = (unsigned int)ntohs(udp->source);
 		unsigned int dest_port = (unsigned int)ntohs(udp->dest);
-        if (dest_port != 4848){
+        if (dest_port != PORT){
             dropped_packets++;
             return 0;
         }
